@@ -28,7 +28,7 @@ yarn-error.*
 # macOS
 .DS_Store
 *.pem
-l
+
 # dotenv environment variable files
 .env
 .env.development.local
