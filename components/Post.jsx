@@ -7,7 +7,7 @@ const Post = ({ navigation, post }) => {
   return post ? (
     <View style={styles.postCard}>
       <View style={styles.imgWrapper}>
-        <Image source={post.photo} style={styles.img} />
+        <Image source={{ uri: post.photoUrl }} style={styles.img} />
       </View>
       <Text style={styles.postTitle}>{post.name}</Text>
       <View style={styles.postDescription}>
@@ -17,7 +17,7 @@ const Post = ({ navigation, post }) => {
             onPress={() => navigation.navigate("Comments", { post })}
           >
             <Feather name="message-circle" size={24} color="#BDBDBD" />
-            <Text style={styles.feedbackText}>8</Text>
+            <Text style={styles.feedbackText}>{post.commentCount}</Text>
           </TouchableOpacity>
           <View style={styles.feedbackItem}>
             <MaterialIcons name="thumb-up" size={24} color="#FF6C00" />

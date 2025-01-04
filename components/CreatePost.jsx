@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 import { CameraView, Camera } from "expo-camera";
+import { Image } from "react-native";
 import * as Location from "expo-location";
 import * as MediaLibrary from "expo-media-library";
 import * as ImagePicker from "expo-image-picker";

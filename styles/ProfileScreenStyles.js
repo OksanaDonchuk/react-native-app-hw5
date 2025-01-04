@@ -46,7 +46,7 @@ export default StyleSheet.create({
   },
   closeIconWrapper: {
     position: "absolute",
-    right: -12, // Трохи зсунули вправо
+    right: -12,
     bottom: 10,
     width: 25,
     height: 25,

@@ -41,6 +41,11 @@ export default StyleSheet.create({
     fontWeight: 500,
     zIndex: 2,
   },
+  contentContainer: {
+    flexGrow: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   iconWrapper: {
     position: "absolute",
     top: "50%",
@@ -67,13 +72,13 @@ export default StyleSheet.create({
     gap: 8,
     marginBottom: 32,
   },
-  imgWrapper: {
+  imgWrapperUser: {
     width: 28,
     height: 28,
     borderRadius: "50%",
     overflow: "hidden",
   },
-  img: {
+  imgUser: {
     width: "100%",
     height: "100%",
     objectFit: "cover",

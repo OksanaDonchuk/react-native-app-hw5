@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
@@ -48,22 +48,31 @@ const ProfileScreen = ({ navigation }) => {
         <ScrollView contentContainerStyle={styles.scrollView}>
           <View style={styles.contentContainer}>
             <View style={styles.avatarWrapper}>
-              {user?.photoURL && (
+              {user?.photoURL ? (
                 <Image source={{ uri: user.photoURL }} style={styles.avatar} />
+              ) : (
+                <MaterialIcons
+                  name="person"
+                  size={120}
+                  color="#BDBDBD"
+                  style={styles.avatar}
+                />
               )}
+              <TouchableOpacity style={styles.closeIconWrapper}>
+                <MaterialIcons name="close" size={18} color="#BDBDBD" />
+              </TouchableOpacity>
             </View>
+
             <TouchableOpacity
               onPress={() => logoutDB(dispatch)}
               style={styles.logoutBtn}
             >
               <MaterialIcons name="logout" size={24} color="#BDBDBD" />
             </TouchableOpacity>
-
             <TouchableOpacity style={styles.closeIconWrapper}>
               <MaterialIcons name="close" size={18} color="#BDBDBD" />
             </TouchableOpacity>
-
-            <Text style={styles.profileTitle}>{user.displayName}</Text>
+            <Text style={styles.userName}>{user.displayName}</Text>
             <PostList posts={posts} navigation={navigation} />
           </View>
         </ScrollView>

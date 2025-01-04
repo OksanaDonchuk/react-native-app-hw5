@@ -7,7 +7,8 @@ import * as SplashScreen from "expo-splash-screen";
 import StackNavigator from "./navigation/StackNavigator";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider, useDispatch } from "react-redux";
-import { store, persistor } from "./redux/store/store";
+import store from "./redux/store/store";
+
 import { authStateChanged } from "./utils/auth";
 
 SplashScreen.preventAutoHideAsync();

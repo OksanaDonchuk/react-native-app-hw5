@@ -6,8 +6,11 @@ import styles from "../styles/CommentsListStyle";
 const Comment = ({ comment }) => {
   return (
     <View style={styles.commentCard}>
-      <View style={styles.imgWrapper}>
-        <Image source={{ uri: comment.author.photoURL }} style={styles.img} />
+      <View style={styles.imgWrapperUser}>
+        <Image
+          source={{ uri: comment.author.photoURL }}
+          style={styles.imgUser}
+        />
       </View>
       <View style={styles.commentWrapper}>
         <Text style={styles.commentText}>{comment.content}</Text>
@@ -37,7 +40,7 @@ const UserComment = ({ comment }) => {
 
 const CommentsList = ({ comments, userPost }) => {
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView contentContainerStyle={styles.contentContainer}>
       {comments?.map((comment, index) => {
         if (comment.author.id === userPost) {
           return <UserComment comment={comment} key={index} />;

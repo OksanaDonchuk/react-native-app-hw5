@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Image, TextInput, TouchableOpacity } from "react-native";
 import { useSelector } from "react-redux";
 import { getCommentsForPost, addCommentToPost } from "../utils/firestore";

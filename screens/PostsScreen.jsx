@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Image } from "react-native";
 import { useSelector } from "react-redux";
 import { getAllPosts } from "../utils/firestore";
@@ -27,7 +27,7 @@ const PostsScreen = ({ navigation }) => {
       {user && (
         <View style={styles.userContainer}>
           <View style={styles.avatarWrapper}>
-            <Image source={{ uri: user.photoURL }} style={styles.avatarImg} />
+            <Image source={{ uri: user.photoURL }} style={styles.avatar} />
           </View>
           <View>
             <Text style={styles.userName}>{user.displayName}</Text>
