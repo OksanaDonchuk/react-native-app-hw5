@@ -10,13 +10,18 @@ import {
   Keyboard,
   Platform,
 } from "react-native";
+import { useSelector } from "react-redux";
 import { CameraView, Camera } from "expo-camera";
 import * as Location from "expo-location";
 import * as MediaLibrary from "expo-media-library";
+import * as ImagePicker from "expo-image-picker";
+import { uploadImage, getImageUrl } from "../utils/storage";
+import { addPost } from "../utils/firestore";
 import { MaterialIcons } from "@expo/vector-icons";
 import styles from "../styles/CreatePostsStyles";
 
 const CreatePost = ({ navigation }) => {
+  const user = useSelector((state) => state.user.userInfo);
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraRef, setCameraRef] = useState(null);
   const [photo, setPhoto] = useState(null);
@@ -38,6 +43,31 @@ const CreatePost = ({ navigation }) => {
     })();
   }, []);
 
+  const handleImageUpload = async (file, fileName) => {
+    try {
+      const imageRef = await uploadImage("posts", user.uid, file, fileName);
+
+      const imageUrl = await getImageUrl(imageRef);
+
+      return imageUrl;
+    } catch (error) {
+      console.error("Error uploading image", error);
+    }
+  };
+  const handleImageUrl = async () => {
+    const response = await fetch(photo);
+
+    const file = await response.blob();
+
+    const fileName = photo.split("/").pop() || "123";
+    const fileType = file.type;
+
+    const postFile = new File([file], fileName, { type: fileType });
+
+    const imageUrl = await handleImageUpload(postFile, fileName);
+    return imageUrl;
+  };
+
   const takePhoto = async () => {
     if (cameraRef) {
       const photoData = await cameraRef.takePictureAsync();
@@ -46,21 +76,52 @@ const CreatePost = ({ navigation }) => {
     }
   };
 
+  const pickImage = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert("To continue, please allow access to your media library!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: false,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+
+      setPhoto(uri);
+    }
+  };
+
+  const clearForm = () => {
+    setPhoto(null);
+    setName("");
+    setLocationName("");
+  };
+
   const handlePublish = async () => {
+    const photoUrl = await handleImageUrl();
     const location = await Location.getCurrentPositionAsync({});
+    setGeoLocation(location.coords);
     const post = {
-      photo,
+      photoUrl,
       name,
       locationName,
       geoLocation: location.coords,
     };
-    navigation.navigate("Posts", { post });
+    addPost(user.uid, post);
+    clearForm();
+    navigation.navigate("Posts");
   };
 
   if (hasPermission === null) {
     return (
       <View>
-        <Text>Запит дозволу...</Text>
+        <Text>Permission request...</Text>
       </View>
     );
   }
@@ -68,7 +129,7 @@ const CreatePost = ({ navigation }) => {
   if (hasPermission === false) {
     return (
       <View>
-        <Text>Доступ до камери чи локації заборонено</Text>
+        <Text>Camera or location access is denied.</Text>
       </View>
     );
   }
@@ -85,11 +146,13 @@ const CreatePost = ({ navigation }) => {
               style={styles.imageWrapper}
               ref={(ref) => setCameraRef(ref)}
             >
+              <Image source={{ uri: photo }} style={styles.img} />
+
               <TouchableOpacity style={styles.iconWrapper} onPress={takePhoto}>
                 <MaterialIcons name="photo-camera" size={24} color="#BDBDBD" />
               </TouchableOpacity>
             </CameraView>
-            <Text style={styles.inputText}>Завантажте фото</Text>
+            <Text style={styles.inputText}>Upload a photo</Text>
           </View>
           <View style={styles.inputsContainer}>
             <TextInput

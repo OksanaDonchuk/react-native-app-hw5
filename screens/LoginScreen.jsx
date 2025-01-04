@@ -10,6 +10,8 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
 } from "react-native";
+import { useDispatch } from "react-redux";
+import { loginDB } from "../utils/auth";
 import BgImg from "../assets/images/bg-img.jpg";
 import InputField from "../components/InputField";
 import styles from "../styles/LoginScreenStyles";
@@ -19,11 +21,11 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [isShown, setIsShown] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+  const dispatch = useDispatch();
   console.log(navigation);
 
   function handleSubmit() {
-    navigation.replace("Home");
-    Alert.alert("Вхід успішний!");
+    loginDB({ email, password }, dispatch);
     setEmail("");
     setPassword("");
   }

@@ -13,6 +13,9 @@ import {
   Platform,
   TouchableOpacity,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { uploadImage, getImageUrl, removeImage } from "../utils/storage";
+import { registerDB } from "../utils/auth";
 import BgImg from "../assets/images/bg-img.jpg";
 import AddIcon from "../assets/images/add.png";
 import InputField from "../components/InputField";
@@ -22,16 +25,81 @@ const RegistrationScreen = ({ navigation }) => {
   const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarPath, setAvatarPath] = useState("");
   const [isShown, setIsShown] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
 
+  const handleImageUpload = async (file, fileName) => {
+    try {
+      const imageRef = await uploadImage(
+        "user_avatars",
+        "temp",
+        file,
+        fileName
+      );
+      setAvatarPath(imageRef);
+      const imageUrl = await getImageUrl(imageRef);
+
+      return imageUrl;
+    } catch (error) {
+      console.error("Error uploading image and getting URL:", error);
+    }
+  };
+
+  const pickImage = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert("Permission to access media library is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: false,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+
+      const response = await fetch(uri);
+
+      const file = await response.blob();
+
+      const fileName = uri.split("/").pop() || "123";
+      const fileType = file.type;
+
+      const avatarFile = new File([file], fileName, { type: fileType });
+
+      const imageUrl = await handleImageUpload(avatarFile, fileName);
+      setAvatarUrl(imageUrl);
+    }
+  };
+
+  const removeAvatar = async () => {
+    const result = await removeImage(avatarPath);
+
+    if (result) {
+      setAvatarUrl("");
+      setAvatarPath("");
+    }
+  };
+
   function handleSubmit() {
-    console.log({ login: login, email: email, password: password });
-    navigation.replace("Login");
-    Alert.alert("Реєстрація успішна!");
+    const credentials = {
+      avatar: avatarPath,
+      login,
+      email,
+      password,
+    };
+    registerDB(credentials);
     setLogin("");
     setEmail("");
     setPassword("");
+    setAvatarUrl("");
+    setAvatarPath("");
   }
 
   return (
@@ -48,8 +116,14 @@ const RegistrationScreen = ({ navigation }) => {
           >
             <View style={styles.contentContainer}>
               <View style={styles.avatarWrapper}>
-                <Image source={AddIcon} style={styles.addBtn} />
+                {avatarUrl && (
+                  <Image source={{ uri: avatarUrl }} style={styles.avatarImg} />
+                )}
               </View>
+              <TouchableOpacity onPress={pickImage}>
+                <Image source={AddIcon} style={styles.addBtn} />
+              </TouchableOpacity>
+
               <Text style={styles.formTitle}>Реєстрація</Text>
               <View style={{ gap: 16 }}>
                 <InputField
